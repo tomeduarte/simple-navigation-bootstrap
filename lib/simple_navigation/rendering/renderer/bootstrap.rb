@@ -7,7 +7,7 @@ module SimpleNavigation
         list_content = item_container.items.inject([]) do |list, item|
           li_options = item.html_options.reject {|k, v| k == :link}
           li_content = ''
-          li_content << tag_for(item, li_options.delete(:icon)) if item.url or include_sub_navigation?(item)
+          li_content << tag_for(item, li_options.delete(:icon))
           if include_sub_navigation?(item)
             item.sub_navigation.dom_class = [item.sub_navigation.dom_class, 'dropdown-menu'].flatten.compact.join(' ')
             li_content << render_sub_navigation_for(item)
@@ -26,6 +26,9 @@ module SimpleNavigation
       protected
 
       def tag_for(item, icon = nil)
+        unless item.url
+          return item.name
+        end
         url = item.url
         link = Array.new
         link << content_tag(:i, '', :class => [icon].flatten.compact.join(' ')) unless icon.nil?
