@@ -25,7 +25,7 @@ module SimpleNavigation
       protected
 
       def tag_for(item, icon = nil)
-        unless item.url
+        unless item.url and !include_sub_navigation?(item)
           return item.name
         end
         url = item.url
