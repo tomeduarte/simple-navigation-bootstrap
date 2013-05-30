@@ -1,0 +1,57 @@
+module SimpleNavigation
+  module Renderer
+    class BootstrapSplit < SimpleNavigation::Renderer::Base
+      def render(item_container)
+        config_selected_class = SimpleNavigation.config.selected_class
+        SimpleNavigation.config.selected_class = 'active'
+
+        left_items = item_container.items[0, (item_container.items.size / 2.0)]
+        right_items = item_container.items - left_items
+        left_content = render_items(left_items)
+        right_content = render_items(right_items)
+
+        SimpleNavigation.config.selected_class = config_selected_class
+        if skip_if_empty? && item_container.empty?
+          ''
+        else  
+          content_tag(:ul, left_content, {:id => "#{item_container.dom_id}_left", :class => "#{item_container.dom_class}_left"}) +
+          content_tag(:ul, right_content, {:id => "#{item_container.dom_id}_right", :class => "#{item_container.dom_class}_right"}) 
+        end
+      end
+
+      protected
+
+      def render_items(items)
+        items.inject([]) do |list, item|
+          li_options = item.html_options.reject {|k, v| k == :link}
+          li_content = tag_for(item, li_options.delete(:icon))
+          if include_sub_navigation?(item)
+            item.sub_navigation.dom_class = [item.sub_navigation.dom_class, 'dropdown-menu'].flatten.compact.join(' ')
+            li_content << render_sub_navigation_for(item)
+            li_options[:class] = [li_options[:class], 'dropdown'].flatten.compact.join(' ')
+          end
+          list << content_tag(:li, li_content, li_options)
+        end.join
+      end
+
+      def tag_for(item, icon = nil)
+        unless item.url or include_sub_navigation?(item)
+          return item.name
+        end
+        url = item.url
+        link = Array.new
+        link << content_tag(:i, '', :class => [icon].flatten.compact.join(' ')) unless icon.nil?
+        link << item.name
+        if include_sub_navigation?(item)
+          item_options = item.html_options
+          item_options[:link] = Hash.new if item_options[:link].nil?
+          item_options[:link][:class] = Array.new if item_options[:link][:class].nil?
+          item_options[:link][:'data-target'] = '#'
+          item.html_options = item_options
+          link << content_tag(:b, '', :class => 'caret')
+        end
+        link_to(link.join(" "), url, options_for(item))
+      end
+    end
+  end
+end

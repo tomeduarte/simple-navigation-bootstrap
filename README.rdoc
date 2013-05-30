@@ -12,6 +12,11 @@ Follow the {configuration instructions}[https://github.com/andi/simple-navigatio
 To use the Bootstrap renderer, specify it in your view:
  render_navigation :expand_all => true, :renderer => :bootstrap
 
+== Supported renderers
+This fork currently supports two different renderers. Besides the <tt>:bootstrap</tt> renderer, there is also the <tt>:bootstrap_split</tt> renderer that splits the navigation items into two lists.
+To use it, simply select it instead:
+ render_navigation :expand_all => true, :renderer => :bootstrap_split
+
 == Additional Functionality
 In addition to generating Bootstrap-comptible list markup, you may specify 
 an <tt>:icon</tt> attribute on your navigation items, either as an array 
